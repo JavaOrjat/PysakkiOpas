@@ -31,7 +31,6 @@ function loadScript() {
 
 window.onload = loadScript;
 
-
 function parseStops(directionsService, directionsDisplay) {
     var client = new XMLHttpRequest();
     client.open('GET', 'stops.txt');
