@@ -1,4 +1,3 @@
-var lat, lng;
 
 function initialize() {
     var directionsService = new google.maps.DirectionsService();
@@ -13,11 +12,11 @@ function initialize() {
             document.getElementById('map-canvas')
             , mapOptions);
     google.maps.event.addListener(map, "rightclick", function (event) {
-        lat = event.latLng.lat();
-        lng = event.latLng.lng();
+        var lat = event.latLng.lat();
+        var lng = event.latLng.lng();
         document.getElementById('coordinates').innerHTML = "lat: " + lat + ", lng: " + lng;
         directionsDisplay.setMap(map);
-        parseStops(directionsService, directionsDisplay);
+        parseStops(directionsService, directionsDisplay, lat, lng);
 
 
     });
@@ -31,16 +30,16 @@ function loadScript() {
 
 window.onload = loadScript;
 
-function parseStops(directionsService, directionsDisplay) {
+function parseStops(directionsService, directionsDisplay, lat, lng) {
     var client = new XMLHttpRequest();
     client.open('GET', 'stops.txt');
     client.onreadystatechange = function () {
-        closestStop(client.responseText, directionsService, directionsDisplay);
+        closestStop(client.responseText, directionsService, directionsDisplay, lat, lng);
 
     };
     client.send();
 }
-function closestStop(stops, directionsService, directionsDisplay) {
+function closestStop(stops, directionsService, directionsDisplay, lat, lng) {
     var count = 0;
     var closestLat = 99;
     var closestLng = 99;
@@ -58,14 +57,18 @@ function closestStop(stops, directionsService, directionsDisplay) {
         if (count === 4) {
             var currentStopLat = parseFloat(stops.substr(i + 1, 9));
             var currentStopLng = parseFloat(stops.substr(i + 11, 9));
-
-            if (Math.abs(currentStopLat - lat) < Math.abs(closestLat - lat)) {
-                if (Math.abs(currentStopLng - lng) < Math.abs(closestLng - lng)) {
-                    closestLat = currentStopLat;
-                    closestLng = currentStopLng;
-                    closestStopName = currentStop;
-                    link = stops.substr(i + 23, 48);
-                }
+            
+            var currentLatDifference = Math.abs(currentStopLat - lat);
+            var currentLngDifference = Math.abs(currentStopLng - lng);
+            
+            var closestLatDifference = Math.abs(closestLat - lat);
+            var closestLngDifference = Math.abs(closestLng - lng);
+            
+            if ((currentLatDifference+currentLngDifference) < (closestLatDifference+closestLngDifference)) {
+                closestLat = currentStopLat;
+                closestLng = currentStopLng;
+                closestStopName = currentStop;
+                link = stops.substr(i + 23, 48);
             }
             count++;
             i = i + 20;
@@ -88,11 +91,11 @@ function closestStop(stops, directionsService, directionsDisplay) {
     a.innerHTML = "Pysäkin aikataulut (ohjaa HSL:n sivuille)";
     a.href = link;
     console.log(link);
-    calculateAndDisplayRoute(directionsService, directionsDisplay, closestLat, closestLng);
+    calculateAndDisplayRoute(directionsService, directionsDisplay, closestLat, closestLng, lat, lng);
 
 }
 
-function calculateAndDisplayRoute(directionsService, directionsDisplay, closestLat, closestLng) {
+function calculateAndDisplayRoute(directionsService, directionsDisplay, closestLat, closestLng, lat, lng) {
 
     directionsService.route({
         origin: new google.maps.LatLng(lat, lng),
