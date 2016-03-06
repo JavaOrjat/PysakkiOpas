@@ -46,7 +46,6 @@ function closestStop(stops, directionsService, directionsDisplay) {
     var closestLng = 99;
     var closestStopName = "";
     var currentStop = "";
-    var currentLink = "";
     var link = "";
     for (var i = 0, max = stops.length; i < max; i++) {
         if (stops.charAt(i) === ",") {
@@ -65,23 +64,18 @@ function closestStop(stops, directionsService, directionsDisplay) {
                     closestLat = currentStopLat;
                     closestLng = currentStopLng;
                     closestStopName = currentStop;
-                    link = currentLink;
+                    link = stops.substr(i + 23, 48);
                 }
             }
             count++;
             i = i + 20;
             currentStop = "";
         }
-        if (count === 5) {
-            currentLink = "";
-        }
-        if (count === 6) {
-            currentLink = currentLink + stops.charAt(i);
-        }
+
         if (count === 10) {
             count = 0;
         }
-        if (i === stops.length - 1) {
+        if (i === stops.length) {
             stopLng = closestLng;
             stopLat = closestLat;
         }
@@ -90,12 +84,11 @@ function closestStop(stops, directionsService, directionsDisplay) {
 
     closestStopName = closestStopName.substr(2, closestStopName.length - 3);
     document.getElementById('info').innerHTML = "Lähin pysäkki: " + closestStopName;
-    link = link.substr(1,link.length);
     var a = document.getElementById('top');
     a.innerHTML = "Pysäkin aikataulut (ohjaa HSL:n sivuille)";
     a.href = link;
     console.log(link);
-    calculateAndDisplayRoute(directionsService, directionsDisplay, closestLat, closestLng)
+    calculateAndDisplayRoute(directionsService, directionsDisplay, closestLat, closestLng);
 
 }
 
