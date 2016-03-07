@@ -78,6 +78,7 @@ function closestStop(directionsService, directionsDisplay, lat, lng) {
             count = 0;
         }
     }
+    console.log(skipAmount);
     var compare = function (a, b) {
         return b.difference - a.difference;
     };
@@ -125,5 +126,13 @@ document.getElementById("previous").addEventListener("click", function () {
     if (skipAmount > 0) {
         skipAmount--;
     }
+    closestStop(directionsService, directionsDisplay, lat, lng);
+});
+document.getElementById("closest").addEventListener("click", function () {
+    skipAmount = 0;
+    closestStop(directionsService, directionsDisplay, lat, lng);
+});
+document.getElementById("furthest").addEventListener("click", function () {
+    skipAmount = 7583;
     closestStop(directionsService, directionsDisplay, lat, lng);
 });
