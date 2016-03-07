@@ -9,14 +9,12 @@ client.send();
 function initialize() {
     var directionsService = new google.maps.DirectionsService();
     var directionsDisplay = new google.maps.DirectionsRenderer();
-    directionsDisplay.preserveViewport = true;
     var mapOptions = {
         zoom: 16,
         center: new google.maps.LatLng(60.174280, 24.960710)
     };
     var map = new google.maps.Map(
-            document.getElementById('map-canvas')
-            , mapOptions);
+            document.getElementById('map-canvas'), mapOptions);
 
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
@@ -26,7 +24,6 @@ function initialize() {
             };
             directionsDisplay.setMap(map);
             closestStop(directionsService, directionsDisplay, position.coords.latitude, position.coords.longitude);
-
             map.setCenter(pos);
         });
     }
