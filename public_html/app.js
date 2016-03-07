@@ -4,19 +4,37 @@ function initialize() {
     var directionsDisplay = new google.maps.DirectionsRenderer();
     directionsDisplay.preserveViewport = true;
     var mapOptions = {
-        zoom: 15,
+        zoom: 16,
         center: new google.maps.LatLng(60.174280, 24.960710)
     };
-
     var map = new google.maps.Map(
             document.getElementById('map-canvas')
             , mapOptions);
+    var infoWindow = new google.maps.InfoWindow({map: map});
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            var pos = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            };
+
+            infoWindow.setPosition(pos);
+            infoWindow.setContent('Oikea klikkaa sijaintiasi.');
+            map.setCenter(pos);
+        }, function () {
+            handleLocationError(true, infoWindow, map.getCenter());
+        });
+    } else {
+        handleLocationError(false, infoWindow, map.getCenter());
+    }
     google.maps.event.addListener(map, "rightclick", function (event) {
         var lat = event.latLng.lat();
         var lng = event.latLng.lng();
         document.getElementById('coordinates').innerHTML = "lat: " + lat + ", lng: " + lng;
         directionsDisplay.setMap(map);
         parseStops(directionsService, directionsDisplay, lat, lng);
+
 
 
     });
@@ -57,14 +75,14 @@ function closestStop(stops, directionsService, directionsDisplay, lat, lng) {
         if (count === 4) {
             var currentStopLat = parseFloat(stops.substr(i + 1, 9));
             var currentStopLng = parseFloat(stops.substr(i + 11, 9));
-            
+
             var currentLatDifference = Math.abs(currentStopLat - lat);
             var currentLngDifference = Math.abs(currentStopLng - lng);
-            
+
             var closestLatDifference = Math.abs(closestLat - lat);
             var closestLngDifference = Math.abs(closestLng - lng);
-            
-            if ((currentLatDifference+currentLngDifference) < (closestLatDifference+closestLngDifference)) {
+
+            if ((currentLatDifference + currentLngDifference) < (closestLatDifference + closestLngDifference)) {
                 closestLat = currentStopLat;
                 closestLng = currentStopLng;
                 closestStopName = currentStop;
@@ -103,10 +121,19 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay, closestL
         travelMode: google.maps.TravelMode.WALKING
     }, function (response, status) {
         if (status === google.maps.DirectionsStatus.OK) {
+            directionsDisplay.setOptions({preserveViewport: true});
             directionsDisplay.setDirections(response);
+            document.getElementById('distance').innerHTML = "Matkan pituus: " + directionsDisplay.directions.routes[0].legs[0].distance.text;
+
         } else {
 
         }
     });
 
+}
+function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+    infoWindow.setPosition(pos);
+    infoWindow.setContent(browserHasGeolocation ?
+            'Error: The Geolocation service failed.' :
+            'Error: Your browser doesn\'t support geolocation.');
 }

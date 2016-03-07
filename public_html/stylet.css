@@ -19,9 +19,15 @@ html, body {
     left: 1000px;
     font-size: 18px;
 }
-#timetables.wrap {
+#distance.wrap {
     position: absolute;
     top: 120px;
+    left: 1000px;
+    font-size: 18px;
+}
+#timetables.wrap {
+    position: absolute;
+    top: 140px;
     left: 1000px;
     font-size: 18px;
 }
