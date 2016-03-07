@@ -28,11 +28,7 @@ function initialize() {
             closestStop(directionsService, directionsDisplay, position.coords.latitude, position.coords.longitude);
 
             map.setCenter(pos);
-        }, function () {
-            handleLocationError(true, infoWindow, map.getCenter());
         });
-    } else {
-        handleLocationError(false, infoWindow, map.getCenter());
     }
 
     google.maps.event.addListener(map, "rightclick", function (event) {
@@ -113,11 +109,4 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay, closestL
         } else {
         }
     });
-
-}
-function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-    infoWindow.setPosition(pos);
-    infoWindow.setContent(browserHasGeolocation ?
-            'Error: The Geolocation service failed.' :
-            'Error: Your browser doesn\'t support geolocation.');
 }
