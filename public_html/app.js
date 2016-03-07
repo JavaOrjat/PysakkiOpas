@@ -1,4 +1,4 @@
-var text;
+var text, skipAmount = 0, lat, lng, directionsService, directionsDisplay;
 var client = new XMLHttpRequest();
 client.open('GET', 'stops.txt');
 client.onreadystatechange = function () {
@@ -7,8 +7,8 @@ client.onreadystatechange = function () {
 client.send();
 
 function initialize() {
-    var directionsService = new google.maps.DirectionsService();
-    var directionsDisplay = new google.maps.DirectionsRenderer();
+    directionsService = new google.maps.DirectionsService();
+    directionsDisplay = new google.maps.DirectionsRenderer();
     var mapOptions = {
         zoom: 16,
         center: new google.maps.LatLng(60.174280, 24.960710)
@@ -22,35 +22,29 @@ function initialize() {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude
             };
+            lat = position.coords.latitude;
+            lng = position.coords.longitude;
             directionsDisplay.setMap(map);
-            closestStop(directionsService, directionsDisplay, position.coords.latitude, position.coords.longitude);
+            closestStop(directionsService, directionsDisplay, lat, lng);
             map.setCenter(pos);
+
         });
     }
 
     google.maps.event.addListener(map, "rightclick", function (event) {
-        var lat = event.latLng.lat();
-        var lng = event.latLng.lng();
+        lat = event.latLng.lat();
+        lng = event.latLng.lng();
+        skipAmount = 0;
         document.getElementById('coordinates').innerHTML = "lat: " + lat + ", lng: " + lng;
         directionsDisplay.setMap(map);
         closestStop(directionsService, directionsDisplay, lat, lng);
     });
 }
-function loadScript() {
-    var script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&callback=initialize';
-    document.body.appendChild(script);
-}
-window.onload = loadScript;
+
 
 function closestStop(directionsService, directionsDisplay, lat, lng) {
-    var count = 0;
-    var closestLat = 99;
-    var closestLng = 99;
-    var closestStopName = "";
-    var currentStop = "";
-    var link = "";
+    var count = 0, closestLat = 99, closestLng = 99, closestStopName = "", currentStop = "", link = "", stack = [];
+
     for (var i = 0, max = text.length; i < max; i++) {
         if (text.charAt(i) === ",") {
             count++;
@@ -67,13 +61,15 @@ function closestStop(directionsService, directionsDisplay, lat, lng) {
 
             var closestLatDifference = Math.abs(closestLat - lat);
             var closestLngDifference = Math.abs(closestLng - lng);
-
-            if ((currentLatDifference + currentLngDifference) < (closestLatDifference + closestLngDifference)) {
-                closestLat = currentStopLat;
-                closestLng = currentStopLng;
-                closestStopName = currentStop;
-                link = text.substr(i + 23, 48);
-            }
+//            if ((currentLatDifference + currentLngDifference) < (closestLatDifference + closestLngDifference)) {
+            link = text.substr(i + 23, 48);
+            closestLat = currentStopLat;
+            closestLng = currentStopLng;
+            closestStopName = currentStop;
+            closestStopName = closestStopName.substr(2, closestStopName.length - 3);
+            var newStop = new stop(currentStopLat, currentStopLng, closestStopName, link, (currentLatDifference + currentLngDifference));
+            stack.push(newStop);
+//            }
             count++;
             i = i + 20;
             currentStop = "";
@@ -82,14 +78,20 @@ function closestStop(directionsService, directionsDisplay, lat, lng) {
             count = 0;
         }
     }
-
-    closestStopName = closestStopName.substr(2, closestStopName.length - 3);
-    document.getElementById('info').innerHTML = "Lähin pysäkki: " + closestStopName;
+    var compare = function (a, b) {
+        return b.difference - a.difference;
+    };
+    stack.sort(compare);
+    for (var i = 0, max = skipAmount; i < max; i++) {
+        stack.pop();
+    }
+    var s = stack.pop();
+    console.log(s.name);
+    document.getElementById('info').innerHTML = "Lähin pysäkki: " + s.name;
     var a = document.getElementById('top');
     a.innerHTML = "Pysäkin aikataulut (ohjaa HSL:n sivuille)";
-    a.href = link;
-    console.log(link);
-    calculateAndDisplayRoute(directionsService, directionsDisplay, closestLat, closestLng, lat, lng);
+    a.href = s.link;
+    calculateAndDisplayRoute(directionsService, directionsDisplay, s.lat, s.lng, lat, lng);
 }
 
 function calculateAndDisplayRoute(directionsService, directionsDisplay, closestLat, closestLng, lat, lng) {
@@ -106,3 +108,22 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay, closestL
         }
     });
 }
+
+function stop(lat, lng, name, link, difference) {
+    this.lat = lat;
+    this.lng = lng;
+    this.name = name;
+    this.link = link;
+    this.difference = difference;
+}
+
+document.getElementById("next").addEventListener("click", function () {
+    skipAmount++;
+    closestStop(directionsService, directionsDisplay, lat, lng);
+});
+document.getElementById("previous").addEventListener("click", function () {
+    if (skipAmount > 0) {
+        skipAmount--;
+    }
+    closestStop(directionsService, directionsDisplay, lat, lng);
+});

@@ -37,4 +37,22 @@ html, body {
     left: 76%;
     font-size: 18px;
 }
+#previous.wrap {
+    position: absolute;
+    top: 160px;
+    left: 76%;
+    font-size: 18px;
+}
+#next.wrap {
+    position: absolute;
+    top: 160px;
+    left: 83.5%;
+    font-size: 18px;
+}
+#description.wrap {
+    position: absolute;
+    bottom: 10%;
+    left: 76%;
+    font-size: 12px;
+}
 

@@ -6,8 +6,6 @@ and open the template in the editor.
 -->
 <html>
     <head>
-        <script src = "jquery.js" ></script>
-        <script src="app.js"></script>
         <link rel="stylesheet" type="text/css" href="stylet.css">
         <title></title>
         <meta charset="UTF-8">
@@ -31,5 +29,15 @@ and open the template in the editor.
         <div id="timetables" class="wrap">
             <a target="_blank" id="top"></a>
         </div>
+        <div id="description" class="wrap">
+            <p>A on sinä ja B on bussipysäkki. Sovelluksen idea on näyttää sinua (linnuntietä) lähimmät bussipysäkit. Seuraava- ja edellinenpainikkeilla voit selata seuraavaksi lähintä tai edellistä bussipysäkkiä.</p>
+        </div>
+        <button id="next" class="wrap">Seuraava</button>
+        <button id="previous" class="wrap">Edellinen</button>
+
+        <script src = "jquery.js" ></script>
+        <script src="app.js"></script>
+        <script src ="https://maps.googleapis.com/maps/api/js?v=3.exp&callback=initialize"></script>
     </body>
+
 </html>
