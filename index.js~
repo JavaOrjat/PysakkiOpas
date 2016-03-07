@@ -1,0 +1,13 @@
+var express = require("express");
+var app = express();
+app.use(express.static("public_html/app.js"));
+app.use(express.static("public_html/index.html"));
+app.use(express.static("public_html/jquery-mobile.js"));
+app.use(express.static("public_html/jquery.js"));
+app.use(express.static("public_html/stops.txt"));
+app.use(express.static("public_html/stylet.css"));
+
+app.set("port", (process.env.PORT || 3000));
+app.listen(app.get("port"), function() {
+console.log("Softa pyörii portis", app.get("port"));
+});
