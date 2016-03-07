@@ -27,7 +27,10 @@ build/Release
 node_modules/
 
 # Bower
-public_html/bower_components
+public/bower_components
+
+# Gedit files in Linux
+*~
 
 # stop using netbeans for javascript dawg
 nbproject/
