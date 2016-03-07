@@ -78,7 +78,6 @@ function closestStop(directionsService, directionsDisplay, lat, lng) {
             i = i + 20;
             currentStop = "";
         }
-
         if (count === 10) {
             count = 0;
         }
