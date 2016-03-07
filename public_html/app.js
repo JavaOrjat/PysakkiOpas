@@ -61,7 +61,6 @@ function closestStop(directionsService, directionsDisplay, lat, lng) {
 
             var closestLatDifference = Math.abs(closestLat - lat);
             var closestLngDifference = Math.abs(closestLng - lng);
-//            if ((currentLatDifference + currentLngDifference) < (closestLatDifference + closestLngDifference)) {
             link = text.substr(i + 23, 48);
             closestLat = currentStopLat;
             closestLng = currentStopLng;
@@ -69,7 +68,6 @@ function closestStop(directionsService, directionsDisplay, lat, lng) {
             closestStopName = closestStopName.substr(2, closestStopName.length - 3);
             var newStop = new stop(currentStopLat, currentStopLng, closestStopName, link, (currentLatDifference + currentLngDifference));
             stack.push(newStop);
-//            }
             count++;
             i = i + 20;
             currentStop = "";
