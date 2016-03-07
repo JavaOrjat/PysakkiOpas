@@ -1,3 +1,10 @@
+var text;
+var client = new XMLHttpRequest();
+client.open('GET', 'stops.txt');
+client.onreadystatechange = function () {
+    text = client.responseText;
+};
+client.send();
 
 function initialize() {
     var directionsService = new google.maps.DirectionsService();
@@ -10,7 +17,6 @@ function initialize() {
     var map = new google.maps.Map(
             document.getElementById('map-canvas')
             , mapOptions);
-    var infoWindow = new google.maps.InfoWindow({map: map});
 
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
@@ -18,9 +24,9 @@ function initialize() {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude
             };
+            directionsDisplay.setMap(map);
+            closestStop(directionsService, directionsDisplay, position.coords.latitude, position.coords.longitude);
 
-            infoWindow.setPosition(pos);
-            infoWindow.setContent('Oikea klikkaa sijaintiasi.');
             map.setCenter(pos);
         }, function () {
             handleLocationError(true, infoWindow, map.getCenter());
@@ -28,15 +34,13 @@ function initialize() {
     } else {
         handleLocationError(false, infoWindow, map.getCenter());
     }
+
     google.maps.event.addListener(map, "rightclick", function (event) {
         var lat = event.latLng.lat();
         var lng = event.latLng.lng();
         document.getElementById('coordinates').innerHTML = "lat: " + lat + ", lng: " + lng;
         directionsDisplay.setMap(map);
-        parseStops(directionsService, directionsDisplay, lat, lng);
-
-
-
+        closestStop(directionsService, directionsDisplay, lat, lng);
     });
 }
 function loadScript() {
@@ -45,36 +49,25 @@ function loadScript() {
     script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&callback=initialize';
     document.body.appendChild(script);
 }
-
 window.onload = loadScript;
 
-function parseStops(directionsService, directionsDisplay, lat, lng) {
-    var client = new XMLHttpRequest();
-    client.open('GET', 'stops.txt');
-    client.onreadystatechange = function () {
-        closestStop(client.responseText, directionsService, directionsDisplay, lat, lng);
-
-    };
-    client.send();
-}
-function closestStop(stops, directionsService, directionsDisplay, lat, lng) {
+function closestStop(directionsService, directionsDisplay, lat, lng) {
     var count = 0;
     var closestLat = 99;
     var closestLng = 99;
     var closestStopName = "";
     var currentStop = "";
     var link = "";
-    for (var i = 0, max = stops.length; i < max; i++) {
-        if (stops.charAt(i) === ",") {
+    for (var i = 0, max = text.length; i < max; i++) {
+        if (text.charAt(i) === ",") {
             count++;
         }
         if (count === 3) {
-            currentStop = currentStop + stops.charAt(i);
-
+            currentStop = currentStop + text.charAt(i);
         }
         if (count === 4) {
-            var currentStopLat = parseFloat(stops.substr(i + 1, 9));
-            var currentStopLng = parseFloat(stops.substr(i + 11, 9));
+            var currentStopLat = parseFloat(text.substr(i + 1, 9));
+            var currentStopLng = parseFloat(text.substr(i + 11, 9));
 
             var currentLatDifference = Math.abs(currentStopLat - lat);
             var currentLngDifference = Math.abs(currentStopLng - lng);
@@ -86,7 +79,7 @@ function closestStop(stops, directionsService, directionsDisplay, lat, lng) {
                 closestLat = currentStopLat;
                 closestLng = currentStopLng;
                 closestStopName = currentStop;
-                link = stops.substr(i + 23, 48);
+                link = text.substr(i + 23, 48);
             }
             count++;
             i = i + 20;
@@ -96,12 +89,7 @@ function closestStop(stops, directionsService, directionsDisplay, lat, lng) {
         if (count === 10) {
             count = 0;
         }
-        if (i === stops.length) {
-            stopLng = closestLng;
-            stopLat = closestLat;
-        }
     }
-
 
     closestStopName = closestStopName.substr(2, closestStopName.length - 3);
     document.getElementById('info').innerHTML = "Lähin pysäkki: " + closestStopName;
@@ -110,11 +98,9 @@ function closestStop(stops, directionsService, directionsDisplay, lat, lng) {
     a.href = link;
     console.log(link);
     calculateAndDisplayRoute(directionsService, directionsDisplay, closestLat, closestLng, lat, lng);
-
 }
 
 function calculateAndDisplayRoute(directionsService, directionsDisplay, closestLat, closestLng, lat, lng) {
-
     directionsService.route({
         origin: new google.maps.LatLng(lat, lng),
         destination: new google.maps.LatLng(closestLat, closestLng),
@@ -124,9 +110,7 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay, closestL
             directionsDisplay.setOptions({preserveViewport: true});
             directionsDisplay.setDirections(response);
             document.getElementById('distance').innerHTML = "Matkan pituus: " + directionsDisplay.directions.routes[0].legs[0].distance.text;
-
         } else {
-
         }
     });
 
