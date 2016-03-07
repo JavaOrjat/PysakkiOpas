@@ -26,7 +26,6 @@ function initialize() {
             };
             directionsDisplay.setMap(map);
             closestStop(directionsService, directionsDisplay, position.coords.latitude, position.coords.longitude);
-
             map.setCenter(pos);
         });
     }
@@ -81,7 +80,6 @@ function closestStop(directionsService, directionsDisplay, lat, lng) {
             i = i + 20;
             currentStop = "";
         }
-
         if (count === 10) {
             count = 0;
         }
