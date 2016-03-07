@@ -16,25 +16,25 @@ html, body {
 #info.wrap {
     position: absolute;
     top: 100px;
-    left: 1000px;
+    left: 76%;
     font-size: 18px;
 }
 #distance.wrap {
     position: absolute;
     top: 120px;
-    left: 1000px;
+    left: 76%;
     font-size: 18px;
 }
 #timetables.wrap {
     position: absolute;
     top: 140px;
-    left: 1000px;
+    left: 76%;
     font-size: 18px;
 }
 #help.wrap {
     position: absolute;
     top: 8px;
-    left: 1000px;
+    left: 76%;
     font-size: 18px;
 }
 
