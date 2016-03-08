@@ -101,7 +101,7 @@ function closestStop() {
             hours = time.substr(0, 1);
             minutes = time.substr(1, 2);
         }
-        var node = document.createTextNode(bus + " / " + hours + "." + minutes);
+        var node = document.createTextNode(bus + " / " + hours + "." + minutes+" --> "+timeTable[i].destination);
         para.appendChild(node);
         var element = document.getElementById("bustimes");
         element.appendChild(para);
@@ -137,6 +137,7 @@ function stop(lat, lng, name, link, difference, id) {
 function busTime(bus, time) {
     this.bus = bus;
     this.time = time;
+    this.destination = "";
 }
 
 document.getElementById("next").addEventListener("click", function () {
@@ -176,9 +177,16 @@ function getTimes(stopId) {
     for (var j = 0, max = busCount - 1; j < max; j++) {
         json = json.substr(i);
         var bus = new busTime(json.substr(0, 4), json.substr(46, 4));
+        console.log(json.substr(0, 4));
         timeTable.push(bus);
         json = json.substr(50);
         i = json.search("code") + 9;
+    }
+    json2 = xhr.responseText;
+    for (var i = 0, max = timeTable.length; i < max; i++) {
+        var bus = timeTable[i];
+        var destinationIndex = json2.search("" + bus.bus) + 8;
+        timeTable[i].destination = json2.substr(destinationIndex, 18).replace(/ /g,'');
     }
     return timeTable;
 }
