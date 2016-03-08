@@ -160,7 +160,7 @@ document.getElementById("closest").addEventListener("click", function () {
 
 function getTimes(stopId) {
     var xhr = new XMLHttpRequest();
-    var str = "http://api.reittiopas.fi/hsl/prod/?request=stop&user=dekomo&pass=seppo1&format=txt&code=" + stopId;
+    var str = "http://api.reittiopas.fi/hsl/prod/?request=stop&user=usertoken3&pass=b98a495a3ba&format=txt&code=" + stopId;
     xhr.open("GET", str, false);
     xhr.send();
     var json = xhr.responseText;
