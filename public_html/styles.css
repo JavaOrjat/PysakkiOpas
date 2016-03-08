@@ -72,3 +72,9 @@ html, body {
     font-size: 12px;
 }
 
+#bustimes.wrap {
+    position: absolute;
+    top: 32%;
+    left: 76%;
+    font-size: 14px;
+}
