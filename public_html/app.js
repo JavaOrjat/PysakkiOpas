@@ -86,7 +86,6 @@ function closestStop() {
     for (var i = 0, max = loops; i < max; i++) {
         var para = document.createElement("p");
         var bus = timeTable[i].bus, b = timeTable[i].bus;
-        console.log(bus)
         if (b.charAt(1) === '0') {
             bus = b.substr(2, 2);
         } else if (b.charAt(3).match(/[a-z]/i)) {
@@ -176,8 +175,6 @@ function getTimes(stopId) {
 
     for (var j = 0, max = busCount - 1; j < max; j++) {
         json = json.substr(i);
-//        console.log("bussi: " + json.substr(0, 4));
-//        console.log("aika: " + json.substr(46, 4));
         var bus = new busTime(json.substr(0, 4), json.substr(46, 4));
         timeTable.push(bus);
         json = json.substr(50);
