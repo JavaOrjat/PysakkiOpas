@@ -15,19 +15,19 @@ html, body {
 }
 #info.wrap {
     position: absolute;
-    top: 15%;
+    top: 9%;
     left: 76%;
     font-size: 18px;
 }
 #distance.wrap {
     position: absolute;
-    top: 18%;
+    top: 12%;
     left: 76%;
     font-size: 18px;
 }
 #timetables.wrap {
     position: absolute;
-    top: 21%;
+    top: 15%;
     left: 76%;
     font-size: 18px;
 }
@@ -67,20 +67,20 @@ html, body {
 }
 #description.wrap {
     position: absolute;
-    bottom: 7%;
+    bottom: 1%;
     left: 76%;
-    font-size: 12px;
+    font-size: 10px;
 }
 
 #bustimes.wrap {
     position: absolute;
-    top: 36%;
+    top: 38%;
     left: 76%;
     font-size: 14px;
 }
 #arrivals.wrap {
     position: absolute;
-    top: 31%;
+    top: 34%;
     left: 76%;
     font-size: 18px;
 }
