@@ -177,7 +177,6 @@ function getTimes(stopId) {
     for (var j = 0, max = busCount - 1; j < max; j++) {
         json = json.substr(i);
         var bus = new busTime(json.substr(0, 4), json.substr(46, 4));
-        console.log(json.substr(0, 4));
         timeTable.push(bus);
         json = json.substr(50);
         i = json.search("code") + 9;
