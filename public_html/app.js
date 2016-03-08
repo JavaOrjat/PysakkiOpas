@@ -85,14 +85,14 @@ function closestStop() {
     }
     for (var i = 0, max = loops; i < max; i++) {
         var para = document.createElement("p");
-        var bus = timeTable[i].bus;
+        var bus = timeTable[i].bus, b = timeTable[i].bus;
         console.log(bus)
-        if (timeTable[i].bus.charAt(1) === '0') {
-            bus = timeTable[i].bus.substr(2, 2);
-        } else if (timeTable[i].bus.charAt(3).match(/[a-z]/i)) {
-            bus = timeTable[i].bus.substr(0, 3);
+        if (b.charAt(1) === '0') {
+            bus = b.substr(2, 2);
+        } else if (b.charAt(3).match(/[a-z]/i)) {
+            bus = b.substr(0, 3);
         } else {
-            bus = timeTable[i].bus.substr(1, 4);
+            bus = b.substr(1, 4);
         }
         var time = timeTable[i].time, hours, minutes;
         if (time.length === 4) {
