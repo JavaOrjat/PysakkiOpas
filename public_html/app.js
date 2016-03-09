@@ -1,6 +1,6 @@
 var text, skipAmount = 0, lat, lng, directionsService, directionsDisplay;
 var client = new XMLHttpRequest();
-client.open('GET', 'app/stops.txt');
+client.open('GET', 'stops.txt');
 client.onreadystatechange = function () {
     text = client.responseText;
 };
