@@ -75,13 +75,14 @@ function closestStop() {
     var a = document.getElementById('top');
     a.innerHTML = "Pysäkin aikataulut (ohjaa HSL:n sivuille)";
     a.href = s.link;
-    var timeTable = getTimes(s.id), loops;
-    var old = document.getElementById("bustimes");
+
+
+    calculateAndDisplayRoute(s.lat, s.lng);
+    var timeTable = getTimes(s.id);
+    var old = document.getElementById("bustimes"), loops = timeTable.length;
     old.innerHTML = "";
-    if (timeTable.length > 10) {
-        loops = 10;
-    } else {
-        loops = timeTable.length;
+    if (loops === 0) {
+        document.getElementById("bustimes").innerHTML = "Ei löytynyt aikoja seuraavaan kahteen tuntiin."
     }
     for (var i = 0, max = loops; i < max; i++) {
         var para = document.createElement("p");
@@ -97,16 +98,22 @@ function closestStop() {
         if (time.length === 4) {
             hours = time.substr(0, 2);
             minutes = time.substr(2, 2);
+            if (hours === "24") {
+                hours = 00;
+            } else if (hours === "25") {
+                hours = 01;
+            }
         } else {
             hours = time.substr(0, 1);
             minutes = time.substr(1, 2);
         }
-        var node = document.createTextNode(bus + " / " + hours + "." + minutes+" --> "+timeTable[i].destination);
+
+        var node = document.createTextNode(bus + " / " + hours + ":" + minutes + " --> " + timeTable[i].destination);
         para.appendChild(node);
         var element = document.getElementById("bustimes");
         element.appendChild(para);
     }
-    calculateAndDisplayRoute(s.lat, s.lng);
+
 
 }
 
@@ -154,6 +161,9 @@ document.getElementById("closest").addEventListener("click", function () {
     skipAmount = 0;
     closestStop();
 });
+document.getElementById("search").addEventListener("click", function () {
+    getRoute(document.getElementById("info").innerHTML.substr(15), document.getElementById("input").value);
+});
 //document.getElementById("furthest").addEventListener("click", function () {
 //    skipAmount = 7583;
 //    closestStop();
@@ -161,10 +171,11 @@ document.getElementById("closest").addEventListener("click", function () {
 
 function getTimes(stopId) {
     var xhr = new XMLHttpRequest();
-    var str = "http://api.reittiopas.fi/hsl/prod/?request=stop&user=usertoken3&pass=b98a495a3ba&format=txt&code=" + stopId;
+    var str = "http://api.reittiopas.fi/hsl/prod/?request=stop&dep_limit=10&user=usertoken3&pass=b98a495a3ba&format=txt&code=" + stopId;
     xhr.open("GET", str, false);
     xhr.send();
     var json = xhr.responseText;
+
     var index = json.search("departures"), json = json.substr(index), i = json.search("code") + 9;
     var index = i - 9, busCount = 0, json2 = json;
     var timeTable = [];
@@ -185,7 +196,27 @@ function getTimes(stopId) {
     for (var i = 0, max = timeTable.length; i < max; i++) {
         var bus = timeTable[i];
         var destinationIndex = json2.search("" + bus.bus) + 8;
-        timeTable[i].destination = json2.substr(destinationIndex, 18).replace(/ /g,'');
+        timeTable[i].destination = json2.substr(destinationIndex, 18).replace(/ /g, '');
     }
     return timeTable;
+}
+
+function getRoute(from, to) {
+    var xhr = new XMLHttpRequest();
+    var str = "http://api.reittiopas.fi/hsl/prod/?request=geocode&key=" + to + "&user=usertoken3&pass=b98a495a3ba&format=json"
+    xhr.open("GET", str, false);
+    xhr.send();
+    var json = xhr.responseText, obj = JSON.parse(json), to = obj[0].coords;
+
+    var str = "http://api.reittiopas.fi/hsl/prod/?request=geocode&key=" + from + "&user=usertoken3&pass=b98a495a3ba&format=json"
+    xhr.open("GET", str, false);
+    xhr.send();
+    var json = xhr.responseText, obj = JSON.parse(json), from = obj[0].coords;
+
+    var xhr = new XMLHttpRequest();
+    str = "http://api.reittiopas.fi/hsl/prod/?request=route&from=" + from + "&to=" + to + "&user=usertoken3&pass=b98a495a3ba";
+    xhr.open("GET", str, false);
+    xhr.send();
+    console.log("http://api.reittiopas.fi/hsl/prod/?request=route&from=" + from + "&to=" + to + "&user=usertoken3&pass=b98a495a3ba");
+
 }

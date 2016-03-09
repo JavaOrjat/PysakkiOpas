@@ -15,52 +15,52 @@ html, body {
 }
 #info.wrap {
     position: absolute;
-    top: 9%;
+    top: 4%;
     left: 76%;
     font-size: 18px;
 }
 #distance.wrap {
     position: absolute;
-    top: 12%;
+    top: 7%;
     left: 76%;
     font-size: 18px;
 }
 #timetables.wrap {
     position: absolute;
-    top: 15%;
+    top: 10%;
     left: 76%;
     font-size: 18px;
 }
 #help.wrap {
     position: absolute;
-    top: 3%;
+    top: 1%;
     left: 76%;
     font-size: 18px;
 }
 #previous.wrap {
     position: absolute;
-    top: 24%;
+    top: 19%;
     left: 76%;
     width: 9.6%;
     font-size: 110%;
 }
 #next.wrap {
     position: absolute;
-    top: 24%;
+    top: 19%;
     left: 86%;
     width: 9.6%;
     font-size: 110%;
 }
 #closest.wrap {
     position: absolute;
-    top: 29%;
+    top: 24%;
     left: 76%;
     width: 9.6%;
     font-size: 110%;
 }
 #furthest.wrap {
     position: absolute;
-    top: 29%;
+    top: 24%;
     left: 86%;
     width: 9.6%;
     font-size: 100%;
@@ -83,4 +83,18 @@ html, body {
     top: 34%;
     left: 76%;
     font-size: 18px;
+}
+#addressinput.wrap {
+    position: absolute;
+    top: 29%;
+    left: 76%;
+    font-size: 18px;
+}
+#search.wrap {
+    position: absolute;
+    top: 29%;
+    left: 94.5%;
+    width: 5%;
+    height: 4.5%;
+    font-size: 110%;
 }
