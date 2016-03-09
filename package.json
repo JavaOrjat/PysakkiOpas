@@ -21,6 +21,16 @@
   },
   "homepage": "https://github.com/ahjyrkia/PysakkiOpas",
   "dependencies": {
-    "express": "^4.13.4"
+    "body-parser": "^1.15.0",
+    "express": "^4.13.4",
+    "mongoose": "^4.4.5",
+    "q": "^1.4.1"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-nodemon": "^2.0.4",
+    "morgan": "^1.6.1",
+    "wrench": "^1.5.8"
   }
 }

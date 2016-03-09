@@ -1,0 +1,24 @@
+{
+  "name": "PysakkiOpas",
+  "description": "* [Linkki sovellukseen](http://pysakki-opas.bitballoon.com/)",
+  "main": "index.js",
+  "authors": [
+    "ahjyrkia"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/ahjyrkia/PysakkiOpas",
+  "moduleType": [
+    "node"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public_html/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^2.2.1"
+  }
+}
