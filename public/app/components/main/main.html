@@ -1,0 +1,37 @@
+<div class="main-container>
+    <div id="map-canvas"></div>
+    <div id="info" class="wrap">
+        <p></p>
+    </div>
+
+    <div id="coordinates" class="wrap">
+        {{ coordinates }}
+    </div>
+    
+    <div id="help" class="wrap">
+        <p>Oikea klikkaa sijaintiasi.</p>
+    </div>
+    <div id="distance" class="wrap">
+    </div>
+    <div id="timetables" class="wrap">
+        <a target="_blank" id="top"></a>
+    </div>
+    <div id="addressinput" class="wrap">
+        <input id="input" type="text" placeholder="Anna osoite">
+    </div>
+    <div id="arrivals" class="wrap">
+        <p>Seuraavaksi pysäkille saapuvat vuorot: </p>
+    </div>
+    <div id="bustimes" class="wrap">
+    </div>
+    <div id="description" class="wrap">
+        <p>A on sinä ja B on bussipysäkki. Sovelluksen idea on näyttää sinua (linnuntietä) lähimmät bussi- tai 
+            ratikkapysäkit ja niille seuraavaksi saapuvat vuorot. Seuraava- ja edellinenpainikkeilla voit 
+            selata seuraavaksi lähintä tai edellistä pysäkkiä. Lähin-painike näyttää A:ta lähimmän pysäkin.</p>
+    </div>
+
+    <button ng-click="nextStop()" id="next" class="wrap">Seuraava</button>
+    <button ng-click="previousStop()" id="previous" class="wrap">Edellinen</button>
+    <button ng-click="closestStop()" id="closest" class="wrap">Lähin</button>
+    <button ng-click="searchStop()" id="search" class="wrap">:D</button>
+</div>

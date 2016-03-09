@@ -1,7 +1,7 @@
 {
   "name": "PysakkiOpas",
-  "version": "1.0.0",
-  "description": "* [Linkki sovellukseen](http://pysakki-opas.bitballoon.com/)",
+  "version": "0.0.1",
+  "description": "yo yo sovellus oon ja päheä",
   "main": "index.js",
   "directories": {
     "test": "test"
@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ahjyrkia/PysakkiOpas.git"
+    "url": "https://github.com/JavaOrjat/PysakkiOpas.git"
   },
-  "author": "ahjyrkia",
+  "author": "ahjyrkia, TeemuKoivisto",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ahjyrkia/PysakkiOpas/issues"
+    "url": "https://github.com/JavaOrjat/PysakkiOpas/issues"
   },
-  "homepage": "https://github.com/ahjyrkia/PysakkiOpas",
+  "homepage": "https://github.com/JavaOrjat/PysakkiOpas",
   "dependencies": {
     "body-parser": "^1.15.0",
     "express": "^4.13.4",
