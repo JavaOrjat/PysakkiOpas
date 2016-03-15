@@ -118,10 +118,11 @@ function closestStop() {
 }
 
 function calculateAndDisplayRoute(closestLat, closestLng) {
+
     directionsService.route({
         origin: new google.maps.LatLng(lat, lng),
         destination: new google.maps.LatLng(closestLat, closestLng),
-        travelMode: google.maps.TravelMode.WALKING
+        travelMode: google.maps.TravelMode.WALKING,
     }, function (response, status) {
         if (status === google.maps.DirectionsStatus.OK) {
             directionsDisplay.setOptions({preserveViewport: true});
@@ -162,22 +163,20 @@ document.getElementById("closest").addEventListener("click", function () {
     closestStop();
 });
 document.getElementById("search").addEventListener("click", function () {
-    getRoute(document.getElementById("info").innerHTML.substr(15), document.getElementById("input").value);
+    var waypoints = getRoute(document.getElementById("info").innerHTML.substr(15), document.getElementById("input").value);
+    closestStop(waypoints);
 });
-//document.getElementById("furthest").addEventListener("click", function () {
-//    skipAmount = 7583;
-//    closestStop();
-//});
+
 
 function getTimes(stopId) {
     var xhr = new XMLHttpRequest();
     var str = "http://api.reittiopas.fi/hsl/prod/?request=stop&dep_limit=10&user=usertoken3&pass=b98a495a3ba&format=txt&code=" + stopId;
     xhr.open("GET", str, false);
     xhr.send();
-    var json = xhr.responseText;
+    var txt = xhr.responseText;
 
-    var index = json.search("departures"), json = json.substr(index), i = json.search("code") + 9;
-    var index = i - 9, busCount = 0, json2 = json;
+    var index = txt.search("departures"), txt = txt.substr(index), i = txt.search("code") + 9;
+    var index = i - 9, busCount = 0, json2 = txt;
     var timeTable = [];
     while (index !== -1) {
         busCount++;
@@ -186,11 +185,11 @@ function getTimes(stopId) {
     }
 
     for (var j = 0, max = busCount - 1; j < max; j++) {
-        json = json.substr(i);
-        var bus = new busTime(json.substr(0, 4), json.substr(46, 4));
+        txt = txt.substr(i);
+        var bus = new busTime(txt.substr(0, 4), txt.substr(46, 4));
         timeTable.push(bus);
-        json = json.substr(50);
-        i = json.search("code") + 9;
+        txt = txt.substr(50);
+        i = txt.search("code") + 9;
     }
     json2 = xhr.responseText;
     for (var i = 0, max = timeTable.length; i < max; i++) {
@@ -214,9 +213,22 @@ function getRoute(from, to) {
     var json = xhr.responseText, obj = JSON.parse(json), from = obj[0].coords;
 
     var xhr = new XMLHttpRequest();
-    str = "http://api.reittiopas.fi/hsl/prod/?request=route&from=" + from + "&to=" + to + "&user=usertoken3&pass=b98a495a3ba";
+    var str = "http://api.reittiopas.fi/hsl/prod/?request=route&from=" + from + "&to=" + to + "&user=usertoken3&pass=b98a495a3ba";
     xhr.open("GET", str, false);
     xhr.send();
-    console.log("http://api.reittiopas.fi/hsl/prod/?request=route&from=" + from + "&to=" + to + "&user=usertoken3&pass=b98a495a3ba");
+    console.log("http://api.reittiopas.fi/hsl/prod/?request=route&from=" + from + "&to=" + to + "&user=usertoken3&pass=b98a495a3ba&transport_types=bus|walk");
+    var json = xhr.responseText;
+    var obj = JSON.parse(json);
+    var waypoints = [];
+    for (var i = 0, max = obj[0][0].legs.length; i < max; i++) {
+        var leg = obj[0][0].legs[i];
+        for (var j = 0, max = leg.locs.length; j < max; j++) {
+            console.log(leg.locs[j].name);
+            waypoints.push(leg.locs[j].name);
+        }
 
+    }
+
+
+    return waypoints;
 }
