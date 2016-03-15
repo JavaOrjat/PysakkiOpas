@@ -6,7 +6,7 @@ PysakkiopasApp.service("StopsService", function() {
         var client = new XMLHttpRequest();
         client.open('GET', 'app/components/main/stops.txt');
         client.onreadystatechange = function () {
-            this.text = client.responseText;
+            this.stops = client.responseText;
         };
         client.send();
     }

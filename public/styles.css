@@ -1,3 +1,9 @@
+.main-container {
+  margin-left: 15px;
+}
+
+
+/* vanha paska */
 #coordinates.wrap {
     position: absolute;
     top: 8px;
