@@ -158,10 +158,7 @@ document.getElementById("previous").addEventListener("click", function () {
     }
     closestStop();
 });
-document.getElementById("closest").addEventListener("click", function () {
-    skipAmount = 0;
-    closestStop();
-});
+
 document.getElementById("search").addEventListener("click", function () {
     var waypoints = getRoute(document.getElementById("info").innerHTML.substr(15), document.getElementById("input").value);
     closestStop(waypoints);
@@ -200,35 +197,35 @@ function getTimes(stopId) {
     return timeTable;
 }
 
-function getRoute(from, to) {
-    var xhr = new XMLHttpRequest();
-    var str = "http://api.reittiopas.fi/hsl/prod/?request=geocode&key=" + to + "&user=usertoken3&pass=b98a495a3ba&format=json"
-    xhr.open("GET", str, false);
-    xhr.send();
-    var json = xhr.responseText, obj = JSON.parse(json), to = obj[0].coords;
-
-    var str = "http://api.reittiopas.fi/hsl/prod/?request=geocode&key=" + from + "&user=usertoken3&pass=b98a495a3ba&format=json"
-    xhr.open("GET", str, false);
-    xhr.send();
-    var json = xhr.responseText, obj = JSON.parse(json), from = obj[0].coords;
-
-    var xhr = new XMLHttpRequest();
-    var str = "http://api.reittiopas.fi/hsl/prod/?request=route&from=" + from + "&to=" + to + "&user=usertoken3&pass=b98a495a3ba";
-    xhr.open("GET", str, false);
-    xhr.send();
-    console.log("http://api.reittiopas.fi/hsl/prod/?request=route&from=" + from + "&to=" + to + "&user=usertoken3&pass=b98a495a3ba&transport_types=bus|walk");
-    var json = xhr.responseText;
-    var obj = JSON.parse(json);
-    var waypoints = [];
-    for (var i = 0, max = obj[0][0].legs.length; i < max; i++) {
-        var leg = obj[0][0].legs[i];
-        for (var j = 0, max = leg.locs.length; j < max; j++) {
-            console.log(leg.locs[j].name);
-            waypoints.push(leg.locs[j].name);
-        }
-
-    }
-
-
-    return waypoints;
-}
+//function getRoute(from, to) {
+//    var xhr = new XMLHttpRequest();
+//    var str = "http://api.reittiopas.fi/hsl/prod/?request=geocode&key=" + to + "&user=usertoken3&pass=b98a495a3ba&format=json"
+//    xhr.open("GET", str, false);
+//    xhr.send();
+//    var json = xhr.responseText, obj = JSON.parse(json), to = obj[0].coords;
+//
+//    var str = "http://api.reittiopas.fi/hsl/prod/?request=geocode&key=" + from + "&user=usertoken3&pass=b98a495a3ba&format=json"
+//    xhr.open("GET", str, false);
+//    xhr.send();
+//    var json = xhr.responseText, obj = JSON.parse(json), from = obj[0].coords;
+//
+//    var xhr = new XMLHttpRequest();
+//    var str = "http://api.reittiopas.fi/hsl/prod/?request=route&from=" + from + "&to=" + to + "&user=usertoken3&pass=b98a495a3ba";
+//    xhr.open("GET", str, false);
+//    xhr.send();
+//    console.log("http://api.reittiopas.fi/hsl/prod/?request=route&from=" + from + "&to=" + to + "&user=usertoken3&pass=b98a495a3ba&transport_types=bus|walk");
+//    var json = xhr.responseText;
+//    var obj = JSON.parse(json);
+//    var waypoints = [];
+//    for (var i = 0, max = obj[0][0].legs.length; i < max; i++) {
+//        var leg = obj[0][0].legs[i];
+//        for (var j = 0, max = leg.locs.length; j < max; j++) {
+//            console.log(leg.locs[j].name);
+//            waypoints.push(leg.locs[j].name);
+//        }
+//
+//    }
+//
+//
+//    return waypoints;
+//}
