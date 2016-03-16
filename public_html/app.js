@@ -1,4 +1,4 @@
-var text, skipAmount = 0, lat, lng, directionsService, directionsDisplay
+var text, skipAmount = 0, lat, lng, directionsService, directionsDisplay, directionsDisplays = [];
 var map;
 var markers = [];
 var client = new XMLHttpRequest();
@@ -11,6 +11,7 @@ client.send();
 function initialize() {
     directionsService = new google.maps.DirectionsService();
     directionsDisplay = new google.maps.DirectionsRenderer();
+    directionsDisplay.setOptions({suppressMarkers: true});
     var mapOptions = {
         zoom: 16,
         center: new google.maps.LatLng(60.174280, 24.960710)
@@ -33,12 +34,12 @@ function initialize() {
     }
 
     document.getElementById("search").addEventListener("click", function () {
+        for (var i = 0, max = directionsDisplays.length; i < max; i++) {
+            directionsDisplays[i].setMap(null);
+        }
 
         var segments = getRoute(document.getElementById("input").value);
-        var waypts = [];
-
-        var batches = [];
-        var waypoints = [];
+        var waypts = [], batches = [], waypoints = [];
         for (var i = 0, max = segments.length; i < max; i++) {
             var segment = segments[i];
             if (segment == null) {
@@ -48,27 +49,27 @@ function initialize() {
                 waypoints.push(segment.waypoints[j]);
             }
         }
-        waypoints.reverse();
-        while (true) {
-            var b = new batch([]);
-            for (var i = 0, max = 10; i < max; i++) {
-                if (waypoints.length === 0) {
-                    break;
-                }
-                b.waypoints.push(waypoints.pop());
+        // korjaa reiät reitin piirtämisessä
+        var b = new batch([]);
+        for (var i = 0, max = waypoints.length - 1; i < max; i++) {
+            if (b.waypoints.length === 0 && i > 8) {
+                b.waypoints.push(waypoints[i - 1]);
+                b.waypoints.push(waypoints[i]);
+            } else {
+                b.waypoints.push(waypoints[i]);
             }
-            batches.push(b);
-            if (waypoints.length === 0) {
-                break;
+            if (i === max - 1 || b.waypoints.length === 10) {
+                batches.push(b);
+                b = new batch([]);
             }
         }
-
 
         for (var i = 0, max = batches.length - 1; i < max; i++) {
             var batchy = batches[i];
             if (batchy == null) {
                 break;
             }
+//            console.log("uus patch");
             var eka = batchy.waypoints[0].split(",");
             for (var j = 1, max = batchy.waypoints.length - 1; j < max; j++) {
                 var coordy = batchy.waypoints[j].split(",");
@@ -78,9 +79,11 @@ function initialize() {
                 });
             }
             var vika = batchy.waypoints[batchy.waypoints.length - 1].split(",");
-            directionsService = new google.maps.DirectionsService();
+
+
             directionsDisplay = new google.maps.DirectionsRenderer();
-            directionsDisplay.setOptions( { suppressMarkers: true } );
+            directionsDisplays.push(directionsDisplay);
+            directionsDisplay.setOptions({suppressMarkers: true});
             directionsDisplay.setMap(map);
             calculateAndDisplayRoute2(eka[1], eka[0], vika[1], vika[0], waypts, directionsDisplay, directionsService);
             waypts = [];
@@ -89,7 +92,9 @@ function initialize() {
 
     });
     google.maps.event.addListener(map, "rightclick", function (event) {
-
+        for (var i = 0, max = directionsDisplays.length; i < max; i++) {
+            directionsDisplays[i].setMap(null);
+        }
         lat = event.latLng.lat();
         lng = event.latLng.lng();
         skipAmount = 0;
