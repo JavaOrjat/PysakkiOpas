@@ -51,6 +51,13 @@ html, body {
     width: 9.6%;
     font-size: 110%;
 }
+#getTimes.wrap {
+    position: absolute;
+    top: 19%;
+    left: 86%;
+    width: 9.6%;
+    font-size: 110%;
+}
 #closest.wrap {
     position: absolute;
     top: 24%;

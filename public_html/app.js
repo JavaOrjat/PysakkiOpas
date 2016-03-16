@@ -1,12 +1,5 @@
-var text, skipAmount = 0, lat, lng, directionsService, directionsDisplay, directionsDisplays = [];
-var map;
-var markers = [];
-var client = new XMLHttpRequest();
-client.open('GET', 'stops.txt');
-client.onreadystatechange = function () {
-    text = client.responseText;
-};
-client.send();
+var skipAmount = 0, lat, lng, currentStopId, directionsService, directionsDisplay, directionsDisplays = []
+        , map, markers = [];
 
 function initialize() {
     directionsService = new google.maps.DirectionsService();
@@ -30,7 +23,7 @@ function initialize() {
             addMarker(pos);
             directionsDisplay.setMap(map);
             document.getElementById('origininput').value = getLocationName();
-            closestStop();
+            closestStops();
             map.setCenter(pos);
         });
     }
@@ -44,6 +37,9 @@ function initialize() {
 
 
         var segments = getRoute(document.getElementById("input").value);
+        if (segments == null) {
+            return;
+        }
         var lats = segments[0].split(",");
         var lngs = segments[1].split(",");
         directionsDisplay = new google.maps.DirectionsRenderer();
@@ -55,6 +51,7 @@ function initialize() {
     });
 
     google.maps.event.addListener(map, "rightclick", function (event) {
+        document.getElementById("bustimes").innerHTML = "";
         for (var i = 0, max = directionsDisplays.length; i < max; i++) {
             directionsDisplays[i].setMap(null);
         }
@@ -64,7 +61,7 @@ function initialize() {
         document.getElementById('coordinates').innerHTML = "lat: " + lat + ", lng: " + lng;
         directionsDisplay.setMap(map);
         document.getElementById('origininput').value = getLocationName();
-        closestStop();
+        closestStops();
         var pos = {
             lat: lat,
             lng: lng
@@ -87,89 +84,32 @@ function initialize() {
         }
     }
 }
-function closestStop() {
-    //tää pitää korjaa
-    var count = 0, currentStop = "", currentStop = "", link = "", stack = [], id = "";
-
-    for (var i = 0, max = text.length; i < max; i++) {
-        if (text.charAt(i) === ",")
-            count++;
-        if (count === 0) {
-            id = id + text.charAt(i);
-        }
-        if (count === 3)
-            currentStop = currentStop + text.charAt(i);
-        if (count === 4) {
-            var currentStopLat = parseFloat(text.substr(i + 1, 9)), currentStopLng = parseFloat(text.substr(i + 11, 9));
-            var currentLatDifference = Math.abs(currentStopLat - lat), currentLngDifference = Math.abs(currentStopLng - lng);
-
-            link = text.substr(i + 23, 48);
-            currentStop = currentStop.substr(2, currentStop.length - 3);
-            var newStop = new stop(currentStopLat, currentStopLng, currentStop, link, (currentLatDifference + currentLngDifference), id);
-            stack.push(newStop), count++, i = i + 20, currentStop = "", id = "";
-
-        }
-        if (count === 10)
-            count = 0;
+function closestStops() {
+    var xhr = new XMLHttpRequest();
+    var str = "http://api.reittiopas.fi/hsl/prod/?request=stops_area&user=usertoken3&pass=b98a495a3ba&format=json&epsg_out=4326&epsg_in=4326&center_coordinate=" + lng + "," + lat;
+    xhr.open("GET", str, false);
+    xhr.send();
+    var json = xhr.responseText, obj = JSON.parse(json);
+    var closest = obj[skipAmount];
+    if (closest == null) {
+        skipAmount--;
+        return;
     }
-
-    stack.sort(function (a, b) {
-        return b.difference - a.difference;
-    });
-    for (var i = 0, max = skipAmount; i < max; i++) {
-        stack.pop();
-    }
-    var s = stack.pop();
-
-    document.getElementById('info').innerHTML = "Lähin pysäkki: " + s.name;
-    var a = document.getElementById('top');
-    a.innerHTML = "Pysäkin aikataulut (ohjaa HSL:n sivuille)";
-    a.href = s.link;
-
-
-
-    var timeTable = getTimes(s.id);
-    var old = document.getElementById("bustimes"), loops = timeTable.length;
-    old.innerHTML = "";
-    if (loops === 0) {
-        document.getElementById("bustimes").innerHTML = "Ei löytynyt aikoja seuraavaan kahteen tuntiin."
-    }
-    for (var i = 0, max = loops; i < max; i++) {
-        var para = document.createElement("p");
-        var bus = timeTable[i].bus, b = timeTable[i].bus;
-        if (b.charAt(1) === '0') {
-            bus = b.substr(2, 2);
-        } else if (b.charAt(3).match(/[a-z]/i)) {
-            bus = b.substr(0, 3);
-        } else {
-            bus = b.substr(1, 4);
-        }
-        var time = timeTable[i].time, hours, minutes;
-        if (time.length === 4) {
-            hours = time.substr(0, 2);
-            minutes = time.substr(2, 2);
-            if (hours === "24") {
-                hours = 00;
-            } else if (hours === "25") {
-                hours = 01;
-            }
-        } else {
-            hours = time.substr(0, 1);
-            minutes = time.substr(1, 2);
-        }
-
-        var node = document.createTextNode(bus + " / " + hours + ":" + minutes + " --> " + timeTable[i].destination);
-        para.appendChild(node);
-        var element = document.getElementById("bustimes");
-        element.appendChild(para);
-    }
+    var coords = closest.coords.split(",");
+    currentStopId = closest.code;
+    var link = document.createElement('a');
+    var codeShort = document.createTextNode("(" + closest.codeShort + ")");
+    link.appendChild(codeShort);
+    link.href = "http://aikataulut.reittiopas.fi/pysakit/fi/" + closest.code + ".html"
+    document.getElementById("info").innerHTML = "Pysäkki: " + closest.name + " ";
+    document.getElementById("info").appendChild(link);
     for (var i = 0, max = directionsDisplays.length; i < max; i++) {
         directionsDisplays[i].setMap(null);
     }
     directionsDisplay = new google.maps.DirectionsRenderer();
     directionsDisplays.push(directionsDisplay);
     directionsDisplay.setMap(map);
-    calculateAndDisplayRoute(lat, lng, s.lat, s.lng, directionsDisplay, directionsService);
+    calculateAndDisplayRoute(lat, lng, coords[1], coords[0], directionsDisplay, directionsService);
 }
 
 function calculateAndDisplayRoute(lat, lng, closestLat, closestLng, directionsDisplay, directionsService) {
@@ -190,20 +130,17 @@ function calculateAndDisplayRoute(lat, lng, closestLat, closestLng, directionsDi
 
 function getInfo(response) {
     var leg = response.routes[0].legs[0];
-    console.log(leg);
-//    console.log("lähtö: "+route);
     var para = document.createElement("p");
     for (var i = 0, max = leg.steps.length; i < max; i++) {
         var depTime = "", arrTime = "", line = "", arrStop = "", depStop = "", finalTime = "";
-        ;
         var step = leg.steps[i];
         if (leg.steps[i].transit == null) {
             if (leg.departure_time != null && i === 0) {
                 depTime = leg.departure_time.text + " / ";
-            } else  if (leg.departure_time != null && i !== 0){
-                depTime = leg.steps[i-1].transit.arrival_time.text+" / ";
+            } else if (leg.departure_time != null && i !== 0) {
+                depTime = leg.steps[i - 1].transit.arrival_time.text + " / ";
             }
-            arrTime = " (matkaa: "+leg.steps[i].distance.text+")";
+            arrTime = " (matkaa: " + leg.steps[i].distance.text + ")";
             line = "Kävele";
             arrStop = step.instructions.substr(8).split(",")[0];
         } else {
@@ -216,7 +153,7 @@ function getInfo(response) {
                 line = "Metro";
             }
         }
-        if (i === max-1 && leg.arrival_time != null) {
+        if (i === max - 1 && leg.arrival_time != null) {
             finalTime = " / " + leg.arrival_time.text;
         }
         var br = document.createElement("br");
@@ -235,53 +172,71 @@ function getInfo(response) {
 }
 
 document.getElementById("next").addEventListener("click", function () {
-    skipAmount++;
-    closestStop();
+    document.getElementById("bustimes").innerHTML = "";
+    if (skipAmount < 10) {
+        skipAmount++;
+        closestStops();
+    }
 });
 document.getElementById("previous").addEventListener("click", function () {
+    document.getElementById("bustimes").innerHTML = "";
     if (skipAmount > 0) {
         skipAmount--;
     }
-    closestStop();
+    closestStops();
 });
 
-function getTimes(stopId) {
-    //tää pitää korjaa
+function getTimes() {
+    document.getElementById("bustimes").innerHTML = "";
     var xhr = new XMLHttpRequest();
-    var str = "http://api.reittiopas.fi/hsl/prod/?request=stop&dep_limit=10&user=usertoken3&pass=b98a495a3ba&format=txt&code=" + stopId;
+    var str = "http://api.reittiopas.fi/hsl/prod/?request=stop&dep_limit=10&user=usertoken3&pass=b98a495a3ba&format=json&code=" + currentStopId;
     xhr.open("GET", str, false);
     xhr.send();
-    var txt = xhr.responseText;
+    var json = xhr.responseText, obj = JSON.parse(json);
+    var line = "", time = "", code = "", destination = "";
+    var para = document.createElement("p");
+    if (obj[0].departures == null) {
+        document.getElementById("bustimes").innerHTML = "Ei seuraavaan kahteen tuntiin saapuvia vuoroja.";
+    } else {
+        for (var i = 0, max = obj[0].departures.length; i < max; i++) {
+            var bus = obj[0].departures[i];
+            code = bus.code.substr(0, bus.code.length - 3);
+            time = "" + bus.time;
+            if (code.substr(0, 2) === "10") {
+                code = code.substr(2);
+            } else if (code.charAt(0) === "4" || code.charAt(0) === "2") {
+                code = code.substr(1);
+            }
+            if (time.charAt(1) === "4") {
+                time = "01:" + time.substr(2);
+            } else if (time.charAt(1) === "5") {
+                time = "02:" + time.substr(2);
+            }
+            for (var i = 0, max = obj[0].lines.length - 1; i < max; i++) {
+                var line = obj[0].lines[i];
+                if (line.search(code)) {
+                    destination = line.split(":")[1];
+                }
+            }
+        }
 
-    var index = txt.search("departures"), txt = txt.substr(index), i = txt.search("code") + 9;
-    var index = i - 9, busCount = 0, json2 = txt;
-    var timeTable = [];
-    while (index !== -1) {
-        busCount++;
-        json2 = json2.substring(index + 1);
-        index = json2.search("code");
+        var br = document.createElement("br");
+        var node = document.createTextNode(code + " / " + time + " -> " + destination);
+        para.appendChild(br);
+        para.appendChild(node);
+        var element = document.getElementById("bustimes");
+        element.appendChild(para);
     }
-
-    for (var j = 0, max = busCount - 1; j < max; j++) {
-        txt = txt.substr(i);
-        var bus = new busTime(txt.substr(0, 4), txt.substr(46, 4));
-        timeTable.push(bus);
-        txt = txt.substr(50);
-        i = txt.search("code") + 9;
-    }
-    json2 = xhr.responseText;
-    for (var i = 0, max = timeTable.length; i < max; i++) {
-        var bus = timeTable[i];
-        var destinationIndex = json2.search("" + bus.bus) + 8;
-        timeTable[i].destination = json2.substr(destinationIndex, 18).replace(/ /g, '');
-    }
-    return timeTable;
 }
+
 
 function getRoute(to) {
     var xhr = new XMLHttpRequest();
     var fromto = [];
     //ask api for coordinates for "to" (input div in html)
+    if (to === "" || to == null) {
+        return;
+    }
     var str = "http://api.reittiopas.fi/hsl/prod/?request=geocode&key=" + to +
             "&user=usertoken3&pass=b98a495a3ba&format=json&epsg_out=4326";
     xhr.open("GET", str, false);
@@ -310,28 +265,4 @@ function getLocationName() {
     var json2 = xhr.responseText, obj2 = JSON.parse(json2);
     return obj2[0].name;
 
-}
-
-function segment(start, end, starttime, endtime, code, type, waypoints) {
-    this.start = start;
-    this.end = end;
-    this.starttime = starttime;
-    this.endtime = endtime;
-    this.buscode = code;
-    this.type = type;
-    this.waypoints = waypoints;
-}
-function stop(lat, lng, name, link, difference, id) {
-    this.lat = lat;
-    this.lng = lng;
-    this.name = name;
-    this.link = link;
-    this.difference = difference;
-    this.id = id;
-}
-
-function busTime(bus, time) {
-    this.bus = bus;
-    this.time = time;
-    this.destination = "";
 }
