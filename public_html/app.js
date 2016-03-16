@@ -28,6 +28,7 @@ function initialize() {
             lng = position.coords.longitude;
             addMarker(pos);
             directionsDisplay.setMap(map);
+            document.getElementById('origininput').value = getLocationName();
             closestStop();
             map.setCenter(pos);
         });
@@ -37,7 +38,6 @@ function initialize() {
         for (var i = 0, max = directionsDisplays.length; i < max; i++) {
             directionsDisplays[i].setMap(null);
         }
-
         var segments = getRoute(document.getElementById("input").value);
         var waypts = [], batches = [], waypoints = [];
         for (var i = 0, max = segments.length; i < max; i++) {
@@ -45,10 +45,18 @@ function initialize() {
             if (segment == null) {
                 continue;
             }
+
             for (var j = 0, max = segment.waypoints.length; j < max; j++) {
                 waypoints.push(segment.waypoints[j]);
             }
         }
+        var latlng = waypoints[0].split(",");
+        var pos = {
+            lat: parseFloat(latlng[1]),
+            lng: parseFloat(latlng[0])
+        };
+        addMarker(pos);
+        waypoints.reverse();
         // korjaa reiät reitin piirtämisessä
         var b = new batch([]);
         for (var i = 0, max = waypoints.length - 1; i < max; i++) {
@@ -80,12 +88,11 @@ function initialize() {
             }
             var vika = batchy.waypoints[batchy.waypoints.length - 1].split(",");
 
-
             directionsDisplay = new google.maps.DirectionsRenderer();
             directionsDisplays.push(directionsDisplay);
             directionsDisplay.setOptions({suppressMarkers: true});
             directionsDisplay.setMap(map);
-            calculateAndDisplayRoute2(eka[1], eka[0], vika[1], vika[0], waypts, directionsDisplay, directionsService);
+            calculateAndDisplayRoute(eka[1], eka[0], vika[1], vika[0], directionsDisplay, directionsService, waypts);
             waypts = [];
 
         }
@@ -99,8 +106,8 @@ function initialize() {
         lng = event.latLng.lng();
         skipAmount = 0;
         document.getElementById('coordinates').innerHTML = "lat: " + lat + ", lng: " + lng;
-
         directionsDisplay.setMap(map);
+        document.getElementById('origininput').value = getLocationName();
         closestStop();
         var pos = {
             lat: lat,
@@ -202,11 +209,16 @@ function closestStop() {
         var element = document.getElementById("bustimes");
         element.appendChild(para);
     }
-
-    calculateAndDisplayRoute(lat, lng, s.lat, s.lng);
+    for (var i = 0, max = directionsDisplays.length; i < max; i++) {
+        directionsDisplays[i].setMap(null);
+    }
+    directionsDisplay = new google.maps.DirectionsRenderer();
+    directionsDisplays.push(directionsDisplay);
+    directionsDisplay.setMap(map);
+    calculateAndDisplayRoute(lat, lng, s.lat, s.lng, directionsDisplay, directionsService);
 }
 
-function calculateAndDisplayRoute(lat, lng, closestLat, closestLng, waypts) {
+function calculateAndDisplayRoute(lat, lng, closestLat, closestLng, directionsDisplay, directionsService, waypts) {
 
     directionsService.route({
         origin: new google.maps.LatLng(lat, lng),
@@ -215,23 +227,7 @@ function calculateAndDisplayRoute(lat, lng, closestLat, closestLng, waypts) {
         waypoints: waypts
     }, function (response, status) {
         if (status === google.maps.DirectionsStatus.OK) {
-            directionsDisplay.setOptions({preserveViewport: true});
-            directionsDisplay.setDirections(response);
-            document.getElementById('distance').innerHTML = "Matkan pituus: " + directionsDisplay.directions.routes[0].legs[0].distance.text;
-        } else {
-        }
-    });
-}
-function calculateAndDisplayRoute2(lat, lng, closestLat, closestLng, waypts, directionsDisplay, directionsService) {
-
-    directionsService.route({
-        origin: new google.maps.LatLng(lat, lng),
-        destination: new google.maps.LatLng(closestLat, closestLng),
-        travelMode: google.maps.TravelMode.WALKING,
-        waypoints: waypts
-    }, function (response, status) {
-        if (status === google.maps.DirectionsStatus.OK) {
-            directionsDisplay.setOptions({preserveViewport: true});
+//            directionsDisplay.setOptions({preserveViewport: true});
             directionsDisplay.setDirections(response);
             document.getElementById('distance').innerHTML = "Matkan pituus: " + directionsDisplay.directions.routes[0].legs[0].distance.text;
         } else {
@@ -292,8 +288,16 @@ function getRoute(to) {
     xhr.send();
     var json = xhr.responseText, obj = JSON.parse(json), to = obj[0].coords;
 
+    //get coordinates from the address in location input bar
+    var location = document.getElementById('origininput').value;
+    var xhr = new XMLHttpRequest();
+    var str = "http://api.reittiopas.fi/hsl/prod/?request=geocode&key=" + location +
+            "&user=usertoken3&pass=b98a495a3ba&format=json&epsg_out=4326";
+    xhr.open("GET", str, false);
+    xhr.send();
+    var json = xhr.responseText, obj = JSON.parse(json), from = obj[0].coords;
+
     //ask api for route "from -> to"
-    var from = lng + "," + lat;
     var str = "http://api.reittiopas.fi/hsl/prod/?request=route&from=" + from +
             "&to=" + to + "&user=usertoken3&pass=b98a495a3ba&epsg_in=4326&epsg_out=4326";
     xhr.open("GET", str, false);
@@ -302,7 +306,6 @@ function getRoute(to) {
     var obj = JSON.parse(json);
 
     var segments = [];
-    ;
     document.getElementById('arrivals').innerHTML = "Reittiohjeet:";
     document.getElementById('bustimes').innerHTML = "";
     var para = document.createElement("p");
@@ -324,7 +327,7 @@ function getRoute(to) {
             if (code.substr(0, 2) === "10") {
                 code = code.substr(2, code.length - 4);
             }
-            if (code.charAt(0) === "2") {
+            if (code.charAt(0) === "2" || code.charAt(0) === "9") {
                 code = code.substr(1, code.length - 4);
             }
         }
@@ -379,6 +382,17 @@ function getRoute(to) {
 
 
     return segments;
+}
+
+function getLocationName() {
+    var string = "http://api.reittiopas.fi/hsl/prod/?request=reverse_geocode&coordinate=" +
+            lng + "," + lat + "&user=usertoken3&pass=b98a495a3ba&format=json&epsg_in=4326";
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", string, false);
+    xhr.send();
+    var json2 = xhr.responseText, obj2 = JSON.parse(json2);
+    return obj2[0].name;
+
 }
 
 function segment(start, end, starttime, endtime, code, type, waypoints) {

@@ -90,6 +90,12 @@ html, body {
     left: 76%;
     font-size: 18px;
 }
+#origin.wrap {
+    position: absolute;
+    top: 24%;
+    left: 76%;
+    font-size: 18px;
+}
 #search.wrap {
     position: absolute;
     top: 29%;
