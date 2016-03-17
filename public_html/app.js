@@ -207,25 +207,27 @@ function getTimes() {
             } else if (code.charAt(0) === "4" || code.charAt(0) === "2") {
                 code = code.substr(1);
             }
-            if (time.charAt(1) === "4") {
+            if (time.substr(0,2) === "24") {
                 time = "01:" + time.substr(2);
-            } else if (time.charAt(1) === "5") {
+            } else if (time.substr(0,2) === "25") {
                 time = "02:" + time.substr(2);
+            } else {
+                time = time.substr(0,2)+":"+time.substr(2,2);
             }
-            for (var i = 0, max = obj[0].lines.length - 1; i < max; i++) {
-                var line = obj[0].lines[i];
+            
+            for (var j = 0, max2 = obj[0].lines.length - 1; j < max2; j++) {
+                var line = obj[0].lines[j];
                 if (line.search(code)) {
                     destination = line.split(":")[1];
                 }
             }
+            var br = document.createElement("br");
+            var node = document.createTextNode(code + " / " + time + " -> " + destination);
+            para.appendChild(br);
+            para.appendChild(node);
+            var element = document.getElementById("bustimes");
+            element.appendChild(para);
         }
-
-        var br = document.createElement("br");
-        var node = document.createTextNode(code + " / " + time + " -> " + destination);
-        para.appendChild(br);
-        para.appendChild(node);
-        var element = document.getElementById("bustimes");
-        element.appendChild(para);
     }
 }
 
