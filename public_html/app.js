@@ -36,7 +36,7 @@ function initialize() {
         document.getElementById("arrivals").innerHTML = "Reittiohjeet: "
 
 
-        var segments = getRoute(document.getElementById("input").value);
+        var segments = getRoute(document.getElementById("addressinput").value);
         if (segments == null) {
             return;
         }
