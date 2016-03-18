@@ -186,6 +186,7 @@ function getInfo(response) {
             arrTime = " (matkaa: " + leg.steps[i].distance.text + ")";
             line = "Kävele";
             arrStop = step.instructions.substr(8).split(",")[0];
+            console.log(step.instructions);
         } else {
             depTime = step.transit.departure_time.text + " / ";
             depStop = step.transit.departure_stop.name + ": ";
