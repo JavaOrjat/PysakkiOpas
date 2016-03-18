@@ -202,6 +202,9 @@ function getInfo(response) {
         var node = document.createTextNode(depTime + depStop + line);
         para.appendChild(br);
         para.appendChild(node);
+        if (arrStop.search("änne:") !== -1) {
+            arrStop = "";
+        }
         node = document.createTextNode(" -> " + arrStop + arrTime + finalTime);
         console.log("arrStop: "+arrStop+" arrTime: "+arrTime+" finalTime: "+finalTime)
         para.appendChild(br);
