@@ -22,7 +22,7 @@ function initialize() {
             lng = position.coords.longitude;
             addMarker(pos);
             directionsDisplay.setMap(map);
-            document.getElementById('origininput').value = getLocationName();
+            document.getElementById('origininput').value = getLocationName(lat, lng);
             closestStops();
             map.setCenter(pos);
         });
@@ -32,8 +32,8 @@ function initialize() {
         for (var i = 0, max = directionsDisplays.length; i < max; i++) {
             directionsDisplays[i].setMap(null);
         }
-        document.getElementById("bustimes").innerHTML = "";
-        document.getElementById("arrivals").innerHTML = "Reittiohjeet: "
+        document.getElementById("routes").innerHTML = "";
+        document.getElementById("arrivals").innerHTML = "Reittiohjeet: ";
 
 
         var segments = getRoute(document.getElementById("addressinput").value);
@@ -44,23 +44,45 @@ function initialize() {
         var lngs = segments[1].split(",");
         directionsDisplay = new google.maps.DirectionsRenderer();
         directionsDisplays.push(directionsDisplay);
-        directionsDisplay.setOptions({suppressMarkers: true});
+//        directionsDisplay.setOptions({suppressMarkers: true});
         directionsDisplay.setMap(map);
         calculateAndDisplayRoute(lats[1], lats[0], lngs[1], lngs[0], directionsDisplay, directionsService);
 
     });
 
     google.maps.event.addListener(map, "rightclick", function (event) {
+        for (var i = 0, max = directionsDisplays.length; i < max; i++) {
+            directionsDisplays[i].setMap(null);
+        }
+        document.getElementById("routes").innerHTML = "";
+        document.getElementById("arrivals").innerHTML = "Reittiohjeet: ";
+        var lat = event.latLng.lat();
+        var lng = event.latLng.lng();
+        var location = getLocationName(lat, lng);
+        document.getElementById("addressinput").value = location;
+        var segments = getRoute(location);
+        if (segments == null) {
+            return;
+        }
+        var lats = segments[0].split(",");
+        var lngs = segments[1].split(",");
+        directionsDisplay = new google.maps.DirectionsRenderer();
+        directionsDisplays.push(directionsDisplay);
+//        directionsDisplay.setOptions({suppressMarkers: true});
+        directionsDisplay.setMap(map);
+        calculateAndDisplayRoute(lats[1], lats[0], lngs[1], lngs[0], directionsDisplay, directionsService);
+    });
+    google.maps.event.addListener(map, "click", function (event) {
         document.getElementById("bustimes").innerHTML = "";
+        document.getElementById("routes").innerHTML = "";
         for (var i = 0, max = directionsDisplays.length; i < max; i++) {
             directionsDisplays[i].setMap(null);
         }
         lat = event.latLng.lat();
         lng = event.latLng.lng();
         skipAmount = 0;
-        document.getElementById('coordinates').innerHTML = "lat: " + lat + ", lng: " + lng;
         directionsDisplay.setMap(map);
-        document.getElementById('origininput').value = getLocationName();
+        document.getElementById('origininput').value = getLocationName(lat, lng);
         closestStops();
         var pos = {
             lat: lat,
@@ -68,7 +90,6 @@ function initialize() {
         };
         addMarker(pos);
     });
-
     function addMarker(location) {
         setMapOnAll(null);
         markers = [];
@@ -84,6 +105,24 @@ function initialize() {
         }
     }
 }
+
+document.getElementById("next").addEventListener("click", function () {
+    document.getElementById("bustimes").innerHTML = "";
+    document.getElementById("routes").innerHTML = "";
+    if (skipAmount < 10) {
+        skipAmount++;
+        closestStops();
+    }
+});
+document.getElementById("previous").addEventListener("click", function () {
+    document.getElementById("bustimes").innerHTML = "";
+    document.getElementById("routes").innerHTML = "";
+    if (skipAmount > 0) {
+        skipAmount--;
+    }
+    closestStops();
+});
+
 function closestStops() {
     var xhr = new XMLHttpRequest();
     var str = "http://api.reittiopas.fi/hsl/prod/?request=stops_area&user=usertoken3&pass=b98a495a3ba&format=json&epsg_out=4326&epsg_in=4326&center_coordinate=" + lng + "," + lat;
@@ -166,28 +205,12 @@ function getInfo(response) {
         node = document.createTextNode("");
         para.appendChild(br);
         para.appendChild(node);
-        var element = document.getElementById("bustimes");
+        var element = document.getElementById("routes");
         element.appendChild(para);
     }
 }
 
-document.getElementById("next").addEventListener("click", function () {
-    document.getElementById("bustimes").innerHTML = "";
-    if (skipAmount < 10) {
-        skipAmount++;
-        closestStops();
-    }
-});
-document.getElementById("previous").addEventListener("click", function () {
-    document.getElementById("bustimes").innerHTML = "";
-    if (skipAmount > 0) {
-        skipAmount--;
-    }
-    closestStops();
-});
-
 function getTimes() {
-    document.getElementById("bustimes").innerHTML = "";
     var xhr = new XMLHttpRequest();
     var str = "http://api.reittiopas.fi/hsl/prod/?request=stop&dep_limit=10&user=usertoken3&pass=b98a495a3ba&format=json&code=" + currentStopId;
     xhr.open("GET", str, false);
@@ -207,14 +230,14 @@ function getTimes() {
             } else if (code.charAt(0) === "4" || code.charAt(0) === "2") {
                 code = code.substr(1);
             }
-            if (time.substr(0,2) === "24") {
+            if (time.substr(0, 2) === "24") {
                 time = "01:" + time.substr(2);
-            } else if (time.substr(0,2) === "25") {
+            } else if (time.substr(0, 2) === "25") {
                 time = "02:" + time.substr(2);
             } else {
-                time = time.substr(0,2)+":"+time.substr(2,2);
+                time = time.substr(0, 2) + ":" + time.substr(2, 2);
             }
-            
+
             for (var j = 0, max2 = obj[0].lines.length - 1; j < max2; j++) {
                 var line = obj[0].lines[j];
                 if (line.search(code)) {
@@ -223,8 +246,9 @@ function getTimes() {
             }
             var br = document.createElement("br");
             var node = document.createTextNode(code + " / " + time + " -> " + destination);
-            para.appendChild(br);
             para.appendChild(node);
+            para.appendChild(br);
+
             var element = document.getElementById("bustimes");
             element.appendChild(para);
         }
@@ -258,7 +282,8 @@ function getRoute(to) {
     return fromto;
 }
 
-function getLocationName() {
+function getLocationName(lat, lng) {
+    console.log(lat, lng);
     var string = "http://api.reittiopas.fi/hsl/prod/?request=reverse_geocode&coordinate=" +
             lng + "," + lat + "&user=usertoken3&pass=b98a495a3ba&format=json&epsg_in=4326";
     var xhr = new XMLHttpRequest();

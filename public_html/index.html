@@ -6,7 +6,6 @@ and open the template in the editor.
 -->
 <html>
     <head>
-        <link rel="stylesheet" type="text/css" href="styles.css">
         <title></title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,31 +17,35 @@ and open the template in the editor.
         <div id="info" class="wrap">
             <p></p>
         </div>
-
         <div id="coordinates" class="wrap">
         </div>
-        <div id="help" class="wrap">
-            <p>Oikea klikkaa sijaintiasi.</p>
+
+        <div id="all" class="wrap">
+            <div id="help" class="wrap">
+                <p></p>
+            </div>
         </div>
+
         <div id="distance" class="wrap">
         </div>
         <div id="timetables" class="wrap">
             <a target="_blank" id="top"></a>
         </div>
-        
-        <input id="origininput" type="text" placeholder="Sijaintisi">
-        <input id="addressinput" type="text" placeholder="Päämäärä">
+
+        <input id="origininput" type="text" placeholder="Mistä">
+        <input id="addressinput" type="text" placeholder="Mihin">
 
         <div id="arrivals" class="wrap">
             <p>Seuraavaksi pysäkille saapuvat vuorot: </p>
         </div>
         <div id="bustimes" class="wrap">
         </div>
-        <div id="description" class="wrap">
-            <p>Oikea klikkaa sijaintiasi, anna sivun paikantaa sinut tai kirjoita sijaintisi ylempään tekstikenttään. Kartalta löydät sinua lähimpänä olevan pysäkin. "Seuraava"- ja "edellinen"-painikkeilla
-            voit selata seuraavaksi lähintä tai edellistä pysäkkiä. "Pysäkin ajat"-painike näyttää kyseisen pysäkin seuraavat saapuvat vuorot. Reittiohjeet saat kirjoittamalla alempaan tekstikenttään päämääräsi ja painamalla "Hae"-painiketta.</p>
+        <div id="routes" class="wrap">
         </div>
-
+        <div id="description" class="wrap">
+            <p>Vasen klikkaa sijaintiasi, anna sivun paikantaa sinut tai kirjoita sijaintisi ylempään tekstikenttään. Kartalta löydät sinua lähimpänä olevan pysäkin. "Seuraava"- ja "edellinen"-painikkeilla
+                voit selata seuraavaksi lähintä tai edellistä pysäkkiä. "Pysäkin ajat"-painike näyttää kyseisen pysäkin seuraavat saapuvat vuorot. Reittiohjeet saat vasen klikkaamalla päämääris kartalta tai kirjoittamalla alempaan tekstikenttään päämääräsi ja painamalla "Hae"-painiketta.</p>
+        </div>
         <button id="next" class="wrap">Seuraava</button>
         <button id="previous" class="wrap">Edellinen</button>
         <button id="search" class="wrap">Hae</button>
@@ -54,6 +57,7 @@ and open the template in the editor.
         <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="styles.css">
     </body>
 
 </html>
