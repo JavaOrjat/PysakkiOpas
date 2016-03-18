@@ -46,6 +46,7 @@ html, body {
     left: 66%;
     width: 9.6%;
     font-size: 110%;
+    height: 4.5%;
 }
 #next.wrap {
     position: absolute;
@@ -53,12 +54,14 @@ html, body {
     left: 76%;
     width: 9.6%;
     font-size: 110%;
+    height: 4.5%;
 }
 #getTimes.wrap {
     position: absolute;
     top: 19%;
     left: 86%;
     width: 9.6%;
+    height: 4.5%;
     font-size: 110%;
 }
 #closest.wrap {
@@ -68,13 +71,7 @@ html, body {
     width: 9.6%;
     font-size: 110%;
 }
-#furthest.wrap {
-    position: absolute;
-    top: 24%;
-    left: 76%;
-    width: 9.6%;
-    font-size: 100%;
-}
+
 #description.wrap {
     position: absolute;
     bottom: 1%;

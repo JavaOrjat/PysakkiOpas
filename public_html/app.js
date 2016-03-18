@@ -55,6 +55,7 @@ function initialize() {
         for (var i = 0, max = directionsDisplays.length; i < max; i++) {
             directionsDisplays[i].setMap(null);
         }
+        document.getElementById("bustimes").innerHTML = "";
         document.getElementById("routes").innerHTML = "";
         document.getElementById("arrivals").innerHTML = "Reittiohjeet: ";
         var lat = event.latLng.lat();
@@ -203,10 +204,10 @@ function getInfo(response) {
         para.appendChild(br);
         para.appendChild(node);
         if (arrStop.search("änne:") !== -1) {
-            arrStop = "";
+            arrStop = "NAME_ERROR";
         }
         node = document.createTextNode(" -> " + arrStop + arrTime + finalTime);
-        console.log("arrStop: "+arrStop+" arrTime: "+arrTime+" finalTime: "+finalTime)
+        console.log("arrStop: " + arrStop + " arrTime: " + arrTime + " finalTime: " + finalTime)
         para.appendChild(br);
         para.appendChild(node);
         node = document.createTextNode("");
