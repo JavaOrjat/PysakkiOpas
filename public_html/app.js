@@ -185,8 +185,12 @@ function getInfo(response) {
             }
             arrTime = " (matkaa: " + leg.steps[i].distance.text + ")";
             line = "Kävele";
-            arrStop = step.instructions.substr(8).split(",")[0];
-            console.log(step.instructions);
+            if (step.instructions.search("Walk") !== -1) {
+                arrStop = step.instructions.substr(8).split(",")[0];
+            }
+            if (step.instructions.search("Kävele") !== -1) {
+                arrStop = step.instructions.substr(step.instructions.search(":")+1).split(",")[0];
+            }
         } else {
             depTime = step.transit.departure_time.text + " / ";
             depStop = step.transit.departure_stop.name + ": ";
@@ -208,7 +212,6 @@ function getInfo(response) {
             arrStop = "NAME_ERROR";
         }
         node = document.createTextNode(" -> " + arrStop + arrTime + finalTime);
-        console.log("arrStop: " + arrStop + " arrTime: " + arrTime + " finalTime: " + finalTime)
         para.appendChild(br);
         para.appendChild(node);
         node = document.createTextNode("");
