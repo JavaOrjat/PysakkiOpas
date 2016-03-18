@@ -32,7 +32,7 @@ function initialize() {
         for (var i = 0, max = directionsDisplays.length; i < max; i++) {
             directionsDisplays[i].setMap(null);
         }
-        document.getElementById("destination").innerHTML = "";
+        document.getElementById("destinationinput").innerHTML = "";
         document.getElementById("routes").innerHTML = "";
         document.getElementById("arrivals").innerHTML = "Reittiohjeet: ";
 
