@@ -238,7 +238,7 @@ function getTimes() {
             } else if (time.substr(0, 2) === "25") {
                 time = "02:" + time.substr(2);
             } else {
-                time = time.substr(0, 2) + ":" + time.substr(2, 2);
+                time = time.substr(0, 2) + ":asd" + time.substr(2, 2);
             }
             for (var j = 0, max2 = obj[0].lines.length; j < max2; j++) {
                 var line = obj[0].lines[j];
