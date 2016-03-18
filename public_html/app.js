@@ -198,12 +198,12 @@ function getInfo(response) {
         if (i === max - 1 && leg.arrival_time != null) {
             finalTime = " / " + leg.arrival_time.text;
         }
-        console.log(depStop);
         var br = document.createElement("br");
         var node = document.createTextNode(depTime + depStop + line);
         para.appendChild(br);
         para.appendChild(node);
         node = document.createTextNode(" -> " + arrStop + arrTime + finalTime);
+        console.log("arrStop: "+arrStop+" arrTime: "+arrTime+" finalTime: "+finalTime)
         para.appendChild(br);
         para.appendChild(node);
         node = document.createTextNode("");
